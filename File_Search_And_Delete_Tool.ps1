@@ -1,3 +1,4 @@
+#note to revisit this
 $ErrorActionPreferencedefault = $ErrorActionPreference
 
 do {
