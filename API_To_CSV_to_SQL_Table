@@ -1,0 +1,61 @@
+$apiid = (Get-Content C:\admin\LM_REST\security_file.secure)[1]
+$pwdencrypt = (Get-Content C:\admin\LM_REST\security_file.secure)[2]
+
+$user2 = (Get-Content C:\admin\LM_REST\security_file.secure)[4]
+$pwdencrypt2 = (Get-Content C:\admin\LM_REST\security_file.secure)[5]
+
+
+
+
+
+$apiKey = ""
+$resource = ""
+
+$authHeader = @{
+    'Authorization' = "apiToken $apiKey"
+}
+
+
+Invoke-RestMethod -Method Get -Uri $resource -H $authHeader | out-file "File Path"
+Remove-Item "File Path"
+
+#remove specified columns
+Import-Csv "File Path -Delimiter "," | Select * -ExcludeProperty 'Architecture','Agent Pod Name'   |
+    Export-Csv "Network path on SQL Server" -Delimiter "," -Encoding UTF8 -notypeinfo
+
+#gives full access to everyone so that a sql account can view, should be changed to read only
+$sharepath = "File path" 
+$Acl = Get-ACL $SharePath
+$AccessRule= New-Object System.Security.AccessControl.FileSystemAccessRule("everyone","FullControl","Allow")
+$Acl.AddAccessRule($AccessRule)
+Set-Acl $SharePath $Acl
+
+
+$connectionString = “Server=#SQLServer;uid=$User2; pwd=$pwdencrypt2;Integrated Security=False;”
+                $connection = New-Object System.Data.SqlClient.SqlConnection
+                $connection.ConnectionString = $connectionString
+                $connection.Open()
+                [string]$queryCL1 = "DELETE FROM 'tablename';
+
+BULK INSERT [Databasename].[dbo].[tablename]
+FROM 'filepath'
+WITH( 
+      FIELDTERMINATOR = ',', 
+      ROWTERMINATOR = '\n',
+      FIRSTROW = 2 
+    )"
+                $command = $connection.CreateCommand()
+                $command.CommandText = $queryCL1
+                $command.CommandTimeout=0
+                $resultCL1 = $command.ExecuteReader()
+                $tableCL = new-object “System.Data.DataTable”
+                $tableCL.Load($resultCL1)
+#might be able to remove this stuff      
+##############################################          
+$resourcePath = $tableCL | select -exp resourcePath
+                $data  = $tableCL | select -exp value
+                $httpVerb = $tableCL | select -exp httpVerb
+                $rootPropPath = $tableCL | select -exp rootPropPath
+                $data2 = $tableCL | select -exp value2
+##############################################
+                $connection.Close()  
