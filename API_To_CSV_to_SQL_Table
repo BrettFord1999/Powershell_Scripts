@@ -50,12 +50,12 @@ WITH(
                 $resultCL1 = $command.ExecuteReader()
                 $tableCL = new-object “System.Data.DataTable”
                 $tableCL.Load($resultCL1)
-#might be able to remove this stuff      
+      
 ##############################################          
-$resourcePath = $tableCL | select -exp resourcePath
-                $data  = $tableCL | select -exp value
-                $httpVerb = $tableCL | select -exp httpVerb
-                $rootPropPath = $tableCL | select -exp rootPropPath
-                $data2 = $tableCL | select -exp value2
+#$resourcePath = $tableCL | select -exp resourcePath
+#                $data  = $tableCL | select -exp value
+#                $httpVerb = $tableCL | select -exp httpVerb
+#                $rootPropPath = $tableCL | select -exp rootPropPath
+#                $data2 = $tableCL | select -exp value2
 ##############################################
                 $connection.Close()  
