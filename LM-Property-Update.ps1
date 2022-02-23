@@ -1,4 +1,4 @@
-#pull information from a csv to update logicmonitor properties on devices
+#Update Device properties
 
 #insert API key here
 $key = "********************" |convertto-securestring -AsPlainText -force
