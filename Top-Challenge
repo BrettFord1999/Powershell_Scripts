@@ -1,0 +1,19 @@
+#Goal is to recreate the top Linux command
+function top(){
+ Param
+    (
+        [Parameter(Mandatory = $true)] $refresh,
+        [Parameter(Mandatory = $true)] $mb_gb,
+        [Parameter(Mandatory = $false)] $name   
+    )
+
+while ($true) {
+try{
+    Get-Process -Name $name | format-table processname,id,handles,{$_.PM/"1$mb_gb"},ws,cpu
+    }
+    catch {Get-Process  | format-table processname,id,handles,{$_.PM/"1$mb_gb"},ws,cpu }
+sleep($refresh)
+cls
+}
+
+}
