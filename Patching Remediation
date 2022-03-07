@@ -1,0 +1,26 @@
+#windows update logs
+Get-WinEvent -LogName 'Microsoft-Windows-WindowsUpdateClient/Operational'|Where-Object leveldisplayname -eq "Error" |ft -AutoSize
+
+#Check free space on C drive
+$freespace = get-volume C |ft {$_.sizeremaining/"1GB"} -HideTableHeaders |out-string
+
+Write-output "Free space on C:\ drive = $freespace"
+
+#Restart Update service and clear software distribution
+stop-service "windows update"
+stop-service "bits"
+ren %systemroot%\softwaredistribution softwaredistribution.bak
+ren %systemroot%\system32\catroot2 catroot2.bak
+Start-Service "windows update"
+Start-service "bits"
+
+#check for pending reboot
+Install-Module -Name PendingReboot -Force
+Test-PendingReboot -Detailed
+
+
+
+#file system repairs
+DISM.exe /Online /Cleanup-image /Restorehealth
+sfc /scannow
+pause
