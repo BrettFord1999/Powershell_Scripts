@@ -1,0 +1,18 @@
+#Edited from S1 documentation, since this is downloading from a public file share instead of an on prem file share this could be optimized to not need to copy the file.
+
+Invoke-WebRequest distro.magna5cloud.com/s1.exe -outfile C:\temp\s1.exe
+
+$Source = "c:\temp\s1.exe"
+$TimeStamp = get-date -f yyyyMMdd-hh\hmm
+$Destination = "c:\Temp\SentinelOne_" + $TimeStamp
+
+New-Item -ItemType directory -Path $Destination -Force | out-null
+Write-Output "Copying SentinelOne installation to $Destination"
+Copy-Item -Path $Source -Destination $Destination -Force
+$SentinelOneInstallerFilename = Get-ChildItem $Destination | Select-Object -First 1
+
+$installProcess=Start-Process "$Destination\$SentinelOneInstallerFilename" -ArgumentList "/Q" -Passthru
+do {start-sleep -Milliseconds 500}
+until ($installProcess.HasExited)
+Write-Output "Install done"
+
