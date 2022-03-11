@@ -1,2 +1,3 @@
 #Iterate through a list of websites and pull the certificate information
 #Smite api to pull match history and display only matches with certain criteria
+#Pull network config data and post it to documentation
