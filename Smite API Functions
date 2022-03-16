@@ -1,0 +1,112 @@
+#constants
+$devid = ""
+$authkey = ""
+
+
+Function Get-StringHash 
+{ 
+    param
+    (
+        [String] $String,
+        $HashName = "MD5"
+    )
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($String)
+    $algorithm = [System.Security.Cryptography.HashAlgorithm]::Create('MD5')
+    $StringBuilder = New-Object System.Text.StringBuilder 
+  
+    $algorithm.ComputeHash($bytes) | 
+    ForEach-Object { 
+        $null = $StringBuilder.Append($_.ToString("x2")) 
+    } 
+  
+    $StringBuilder.ToString()
+    return 
+}
+
+function create-timestamp{
+$Timestamp = Get-Date
+$Timestamp -f "yyyyMMddHHmmss"
+$Timestamp = $Timestamp.ToUniversalTime().ToString("yyyyMMddHHmmss")
+return $Timestamp
+}
+
+#create session
+function create-session{
+$devid = "4243"
+$authkey = "83BFC8300F4C494E91EEFD54B6A0DA37"
+
+$Timestamp = Get-Date
+$Timestamp -f "yyyyMMddHHmmss"
+$Timestamp = $Timestamp.ToUniversalTime().ToString("yyyyMMddHHmmss")
+
+$method = "createsession"
+
+$signature = "$devid" + "$method" + "$authkey" + "$Timestamp"
+$signature = get-stringhash -string "$signature"
+$signature = $signature.Replace("-","")
+
+ $sessionid = invoke-restmethod -Uri "https://api.smitegame.com/smiteapi.svc/createsessionJson/$devid/$signature/$timestamp" -UseBasicParsing
+ $sessionid
+ $sessionid = $sessionid.session_id
+ return $sessionid
+                         }
+
+
+ #create signature
+ function create-signature($method){
+$signature = "$devid" + "$method" + "$authkey" + "$Timestamp"
+$signature = get-stringhash -string "$signature"
+$signature = $signature.Replace("-","")
+return $signature
+                        }
+
+function get-playerstats($playername){
+create-session
+$sessionid = create-session (2)
+$sessionid = $sessionid[2]
+$timestamp = create-timestamp (2)
+$timestamp = $timestamp[1]
+$signature = create-signature -method getplayer
+Invoke-restmethod "https://api.smitegame.com/smiteapi.svc/getplayerjson/$devid/$signature/$sessionid/$timestamp/$playername" -UseBasicParsing -Verbose |out-file C:\Cabs\players\$playername-id.json
+return
+}
+
+
+function get-smiteitems{
+create-session
+$sessionid = create-session (2)
+$sessionid = $sessionid[2]
+$timestamp = create-timestamp (2)
+$timestamp = $timestamp[1]
+$signature = create-signature -method getitems
+Invoke-restmethod  "https://api.smitegame.com/smiteapi.svc/getitemsjson/$devid/$signature/$sessionid/$timestamp/1" -UseBasicParsing -Verbose |out-file C:\Cabs\Smite-items.json
+return
+}
+
+function get-gods{
+create-session
+$sessionid = create-session (2)
+$sessionid = $sessionid[2]
+$timestamp = create-timestamp (2)
+$timestamp = $timestamp[1]
+$signature = create-signature -method getgods
+Invoke-restmethod  "https://api.smitegame.com/smiteapi.svc/getgodsjson/$devid/$signature/$sessionid/$timestamp/1" -UseBasicParsing -verbose |out-file C:\Cabs\Smite-Gods.json
+return
+}
+
+function Check-smiteconnection{
+Invoke-WebRequest  https://api.smitegame.com/smiteapi.svc/pingjson -UseBasicParsing
+}
+
+
+function Test-smitesession{
+$apimethod = "testsession" + "json"
+$sessionid = create-session (2)
+$sessionid = $sessionid[2]
+$timestamp = create-timestamp (2)
+$timestamp = $timestamp[1]
+$signature = create-signature -method testsession
+$results = Invoke-restmethod  "https://api.smitegame.com/smiteapi.svc/$apimethod/$devid/$signature/$sessionid/$timestamp" -UseBasicParsing -Verbose
+return $results
+}
+
