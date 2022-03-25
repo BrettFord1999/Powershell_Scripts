@@ -4,8 +4,6 @@ set-location ZoneMap\Domains
 $sites = ("test1.com/","test2.com/","test3.com/")
 
 foreach ($site in $sites) {
-set-location "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
-set-location ZoneMap\Domains
 new-item $site -Force #website part without https
 set-location $site
 new-itemproperty . -Name https -Value 2 -Type DWORD -Force
