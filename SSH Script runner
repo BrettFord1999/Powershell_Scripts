@@ -1,10 +1,16 @@
-$csv = get-content C:\cabs\devicelist.csv
+$csv = import-csv C:\cabs\devicelist.csv
 $csv | ForEach-Object {
 $username = $_.username
 $device = $_.ipaddress
 $pass = $_.password
 
-plink.exe -l @username -pw $pass -m "C:\Users\BFord\OneDrive - Magna5\Desktop\Script.txt.txt" $device
-#putty.exe -t -ssh -l $username -pw $pass -m "C:\Users\BFord\OneDrive - Magna5\Desktop\Script.txt.txt" $device
-start-sleep -Seconds 1
+#plink.exe -l $hostname -pw $pass -m "C:\Users\BFord\OneDrive - Magna5\Desktop\Script.txt.txt"
+#putty.exe -ssh $hostname -pw $pass -m "C:\Users\BFord\OneDrive - Magna5\Desktop\Script.txt.txt"
+<#
+#.\plink.exe $hostname -pw $pass -m "C:\Users\netserve\Desktop\script.txt"
+.\putty.exe -ssh $hostname -pw $pass -m "C:\Users\netserve\Desktop\script.txt"
+
+#>
+
+start-sleep -Seconds 5
 }
