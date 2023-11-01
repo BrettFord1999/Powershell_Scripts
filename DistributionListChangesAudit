@@ -1,0 +1,37 @@
+connect-exchangeonline
+Connect-AzureAD
+
+$infoarray = New-Object System.Collections.ArrayList
+
+$results = Search-AdminAuditLog -Cmdlets Add-DistributionGroupMember,Remove-DistributionGroupMember,Update-DistributionGroupMember -StartDate (Get-Date "10/01/2023").ToUniversalTime() -EndDate (Get-Date "11/07/2023").ToUniversalTime()
+
+ForEach ($result in $results){
+
+$MemberID = $result.CmdletParameters | Where-Object {$_.Name -eq "Member"}
+$MemberID = $MemberID.Value
+
+
+$userPull = Get-AzureADUser -ObjectId $MemberID
+$username = $userPull.Displayname
+$UPN = $userPull.UserPrincipalName
+$Date = $result.RunDate
+
+$result.CmdletName = ($result.CmdletName -split '-')[0]
+
+$CustomReturnObject = [PSCustomObject]@{
+    DistributionList = $result.ObjectModified
+    ChangeMade = $result.CmdletName
+    Caller = $result.Caller
+    UserDisplayname = $username
+    UserEmailAddress = $UPN
+    Date = $Date
+}
+
+
+
+$infoarray.Add($CustomReturnObject)
+
+}
+
+
+$infoarray | Export-Csv -Path "C:\Users\adm-bford\Desktop\Audit.csv" -NoTypeInformation
